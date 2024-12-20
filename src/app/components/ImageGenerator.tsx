@@ -51,7 +51,7 @@ export default function ImageGenerator({ generateImage }: ImageGeneratorProps) {
   };
 
   return (
-    // TODO: Update the UI here to show the images generated
+
     
     <div className="min-h-screen flex flex-col justify-between p-8 bg-[#001f3f]">
       <main className="flex-1 flex flex-col items-center gap-8">
@@ -62,14 +62,23 @@ export default function ImageGenerator({ generateImage }: ImageGeneratorProps) {
         )}
 
         {imageUrl && (
-          <div className="w-full max-2xl rounded-lg overflow-hidden shadow-lg">
+          <div className="w-full max-w-2xl rounded-lg overflow-hidden shadow-lg">
             <img
               src={imageUrl}
               alt="Generated artwork"
               className="w-full h-auto"
             />
           </div>
-      )}
+        )}
+
+        {isLoading && (
+            <div className="w-full max-w-2xl flex items-center justify-center">
+              <div
+                className="w-12 h-12 border-4 border-gray-300 border-t-black dark:border-gray"
+                style={{ animation: "spin 1s is linear infinite" }}
+            />
+          </div>
+        )}
       </main>
 
       <footer className="w-full max-w-3xl mx-auto">
