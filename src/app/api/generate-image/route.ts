@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -6,27 +8,43 @@ export async function POST(request: Request) {
     const { text } = body;
 
     // TODO: Call your Image Generation API here
-    // For now, we'll just echo back the text
-    // URL of the web endpoint exposed by your Modal app
-    const modalEndpoint = 'https://elishajean84--app-demo-model-generate-dev.modal.run'; 
+    
+    const url = new URL('https://pentagram--sd-demo-model-generate.modal.run'); 
 
-    // Make a POST request to the Modal service's web endpoint
-    const response = await fetch(modalEndpoint, {
-      method: 'POST',
+    url.searchParams.set("prompt", text)
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "x-API-Key": process.env.API_KEY || "",
+        Accept: "image/jpeg",
       },
-      body: JSON.stringify({ prompt: text }), // Pass the text as a prompt to Modal
     });
 
-    // Wait for the response from Modal and return the result
-    const result = await response.json();
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("API Response:", errorText);
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorText}`
+      );
+    }
+
+    const imageBuffer = await response.arrayBuffer();
+
+    const filename = `${crypto.randomUUID()}.jpg`
+    // also store prompt and image url here
+    const blob = await put(filename, imageBuffer, {
+      access: "public",
+      contentType: "image/jpeg",
+    })
+    
 
     return NextResponse.json({
       success: true,
-      message: `Received: ${text}`,
-      image: result,
+      imageUrl: blob.url,
     });
+
+
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Failed to process request" },

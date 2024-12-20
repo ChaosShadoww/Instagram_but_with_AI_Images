@@ -5,6 +5,7 @@ import { useState } from "react";
 export default function Home() {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +21,20 @@ export default function Home() {
       });
 
       const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to generate image");
+      }
+
+      if (data.imageUrl) {
+        const img = new Image();
+        img.onload = () => {
+          setImageUrl(data.imageUrl);
+        };
+        img.src = data.imageUrl;
+      }
+
+
       console.log(data);
       setInputText("");
     } catch (error) {
@@ -34,6 +49,16 @@ export default function Home() {
     
     <div className="min-h-screen flex flex-col justify-between p-8">
       <main className="flex-1">{/* Main content can go here */}</main>
+
+      {imageUrl && (
+          <div className="w-full max-2xl rounded-lg overflow-hidden shadow-lg">
+            <img
+              src={imageUrl}
+              alt="Generated artwork"
+              className="w-full h-auto"
+            />
+          </div>
+      )}
 
       <footer className="w-full max-w-3xl mx-auto">
         <form onSubmit={handleSubmit} className="w-full">
