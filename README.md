@@ -1,4 +1,4 @@
-# Pentagram: Instagram, but with AI Images
+# Pentagram: AI Image Generation Tool
 
 ## Getting Started
 
